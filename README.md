@@ -1,16 +1,15 @@
+Drupal 7 DrUUID Module
+=======================
 
-DRUUID MODULE
-=============
 
-
-OVERVIEW
+Overview
 ========
 
 This module provides a field for adding universally unique identifiers (UUID) to Drupal entities, called a DRUUID. It also 
 lets you choose which type of valid RFC 4211 compliant UUID type you would like use, i.e. v3, v4 or v5.
 
 
-FEATURES
+Features
 ========
 
  1. Provides a UUID Field 
@@ -20,7 +19,7 @@ FEATURES
     - Lets you choose with RFC compliant UUID code to use when generating DRUUIDS.
 
 
-USAGE
+Usage
 =====
 
 In your custom code => 
@@ -38,13 +37,13 @@ The module now also provides an admin screen, in order to apply the field instan
 bundle types within the system.
 
 
-REQUIREMENTS
+Requirements
 ============
 
 Drupal 7.x only
 
 
-INSTALLATION
+Installation
 ============
 
 Place this module folder in the your drupal module directory and then 
@@ -61,9 +60,9 @@ None at this time...
 CREDITS
 =======
 
-morlene.fisher
-dvdtoth
-modernfidelity
+@morlenefisher
+@dvdtoth
+@modernfidelity
 
 
 SIMILAR PROJECTS
