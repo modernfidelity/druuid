@@ -1,0 +1,232 @@
+<?php
+
+/**
+ *
+ * DRUUID
+ *
+ * @file
+ * Provides functionality for creation of UUIDs within a Drupal context
+ *
+ * @version 1.0
+ * @package druuid
+ *
+ */
+
+/**
+ * Implements of hook_menu().
+ */
+function druuid_menu() {
+
+  $items = array();
+
+  $items['admin/config/system/druuid'] = array(
+      'title' => 'DrUUID',
+      'description' => 'Configure Drupal universally unique identifiers (UUIDs).',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('druuid_admin_form'),
+      'access arguments' => array('administer druuid'),
+      'type' => MENU_NORMAL_ITEM,
+      'file' => 'druuid.admin.inc',
+  );
+
+  $items['admin/config/system/druuid/attach_sync'] = array(
+      'title' => 'Druuid Attach and Create',
+      'description' => 'Attach field and run generate process',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('druuid_admin_attach_form'),
+      'access arguments' => array('administer druuid'),
+      'type' => MENU_LOCAL_ACTION,
+      'file' => 'druuid.admin.inc',
+  );
+
+
+  return $items;
+}
+
+/**
+ * Creates a uuid
+ * @param string $namespace
+ * @return string
+ */
+function druuid_create($version = '4', $namespace = NULL) {
+  switch ($version) {
+    case '3' :
+      return DrUUID::v3();
+      break;
+    case '5' :
+      return DrUUID::v5();
+      break;
+    default :
+      // v4
+      return DrUUID::v4();
+      break;
+  }
+}
+
+/**
+ * hook_permission
+ * @return array
+ */
+function druuid_permission() {
+
+  return array(
+      'administer druuid' => array(
+          'title' => t('Administer Druuid'),
+          'description' => t('Administer Druuid.'),
+      ),
+  );
+}
+
+/**
+ * Implements hook_field_info().
+ *
+ */
+function druuid_field_info() {
+
+  // We name our field as the associative name of the array.
+  return array(
+      'field_druuid' => array(
+          'label' => t('Druuid'),
+          'description' => t('Provides a generated DrUUID'),
+          'no_ui' => TRUE,
+          'default_widget' => 'field_simple_druuid',
+          'default_formatter' => 'field_simple_druuid',
+      ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_info().
+ *
+ */
+function druuid_field_widget_info() {
+  return array(
+      'field_simple_druuid' => array(
+          'label' => t('Druuid'),
+          'field types' => array('field_druuid'),
+      ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ *
+ */
+function druuid_field_formatter_info() {
+  return array(
+      'field_simple_druuid' => array(
+          'label' => t('Simple formatter'),
+          'field types' => array('field_druuid'),
+      ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ *
+ */
+function druuid_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+
+  // Set DRUUID value
+  $value = isset($items[$delta]['druuid']) ? $items[$delta]['druuid'] : druuid_create();
+
+  $widget = $element;
+
+  $widget['#delta'] = $delta;
+
+  switch ($instance['widget']['type']) {
+    // Simple Text
+    case 'field_simple_druuid':
+      $widget += array(
+          '#type' => 'textfield',
+          '#default_value' => $value,
+          '#size' => 50,
+          '#maxlength' => 128,
+          '#disabled' => TRUe,
+      );
+      break;
+  }
+
+  $element['druuid'] = $widget;
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_is_empty().
+ *
+ */
+function druuid_field_is_empty($item, $field) {
+
+  return empty($item['druuid']);
+}
+
+/**
+ * Create an DRUUID field
+ *
+ */
+function druuid_create_field() {
+
+  $record = array(
+      'cardinality' => 1,
+      'field_name' => "field_druuid",
+      'type' => "field_druuid",
+      'module' => "druuid",
+      'storage' => "field_storage_default",
+      'settings' => array(
+          'max_length' => 128, // default
+      ),
+      'translatable' => TRUE, // default is FALSE
+      'entity_types' => array(), // default
+  );
+
+  $field = field_info_field("field_druuid");
+
+  if (empty($field)) {
+    $field = field_create_field($record);
+  }
+}
+
+/**
+ * Menu callback. $entity_type argument not currently used in the UI.
+ *
+ * @param type $entity_type
+ * @return type
+ */
+function druuid_entity_info_page($entity_type = NULL) {
+  $info = entity_get_info($entity_type);
+  ksort($info);
+  return kprint_r($info, TRUE);
+}
+
+/**
+ * Implements hook_node_presave();
+ */
+function druuid_node_presave($node) {
+  if (module_exists('druuid')) {
+    if (field_info_instance('node', 'field_druuid', $node->type)) {
+      if ( $node->is_new) {
+        $node->field_druuid[LANGUAGE_NONE][0]['druuid'] = druuid_create();
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_attach_form
+ * @param type $entity_type
+ * @param type $entity
+ * @param type $form
+ * @param type $form_state
+ * @param type $langcode
+
+function druuid_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  $form['field_druuid'][$langcode][0]['value'] = array(
+        '#type' => 'textfield',
+        '#title' => t('DrUUID'),
+        '#default_value' => isset($entity->field_druuid[$lang][0]['value']) ? $entity->field_druuid[$lang][0]['value'] : druuid_create(),
+        '#maxlength' => 40,
+        '#required' => TRUE,
+        '#disabled' => TRUE,
+    );
+} */

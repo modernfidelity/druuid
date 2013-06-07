@@ -1,0 +1,8 @@
+name = Druuid
+description = The ultimate Drupal UUID generator
+core = 7.x
+version = "7.x-1.0-dev"
+
+files[] = druuid.test
+files[] = druuid.class.php
+files[] = druuid.admin.inc

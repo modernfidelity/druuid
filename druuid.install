@@ -1,0 +1,51 @@
+<?php
+
+/**
+ *
+ * @file
+ * Install file for the Druuid module
+ *
+ *
+ */
+
+/**
+ * Implements hook_field_schema().
+ *
+ */
+function druuid_field_schema($field) {
+  $columns = array(
+      'druuid' => array('type' => 'varchar', 'length' => 128, 'not null' => FALSE),
+  );
+  $indexes = array(
+      'druuid' => array('druuid'),
+  );
+  return array(
+      'columns' => $columns,
+      'indexes' => $indexes,
+  );
+}
+
+/**
+ * Implements hook_uninstall().
+ * Removes all instances of the field_druiid and removes the field
+ */
+function druuid_uninstall() {
+
+  // druid field
+  $field_name = "field_druuid";
+
+  // entity list
+  $entity_list = entity_get_info();
+
+  foreach ($entity_list as $entity_type => $entity) {
+    foreach ($entity['bundles'] as $bundle => $bundle_name) {
+      // check if field exists in the bundle
+      $instance = field_read_instance($entity_type, $field_name, $bundle);
+      if ($instance) {
+        field_delete_instance($instance); // cleans up if it's the last instance of the field
+        watchdog('druuid', 'Deleting the druid field from the !bundle bundle', array('!bundle' => $bundle));
+      }
+    }
+  }
+}
+

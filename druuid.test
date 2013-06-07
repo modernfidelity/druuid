@@ -1,0 +1,42 @@
+<?php
+
+/**
+ *
+ * @file
+ * Provides unit tests for the Druuid module
+ *
+ * @see modules/simpletest/drupal_web_test_case.php
+ *
+ */
+class DruuidUnitTestCase extends DrupalUnitTestCase {
+
+  public static function getInfo() {
+    return array(
+        'name' => 'Druuid unit tests',
+        'description' => 'Test that Druuid module works properly.',
+        'group' => 'Druuid',
+    );
+  }
+
+  function setUp() {
+    drupal_load('module', 'druuid');
+    parent::setUp();
+    module_load_include('php', 'druuid', 'druid.class');
+  }
+
+  /**
+   * Call druuid_create() and check that it returns correct
+   * result.
+   *
+   * Note that no environment is provided; we're just testing the correct
+   * behavior of a function when passed specific arguments or left empty.
+   */
+  public function testCreateFunction() {
+
+    $result = druuid_create();
+    $message = t('A single call to create should return TRUE.');
+    $this->assertTrue($result, $message);
+  }
+
+}
+
